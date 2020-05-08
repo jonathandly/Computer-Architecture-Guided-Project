@@ -72,12 +72,46 @@ add_numbers = [
 ]
 
 # this is where we "load" a program
-memory = add_numbers
+memory = [0] * 256
+# memory = add_numbers
+# memory = save_num_to_reg
+
+## Read from file and load into memory
+## read the filename from command line arguments
+## open the file, and load each line into memory
+## lets try not to crash
+
+def load_program_into_memory():
+    # reset the memory first
+    # memory = [] use global instead of local memory var here
+    address = 0
+    # get the filename from arguments here
+    print(sys.argv)
+    if len(sys.argv) != 2:
+        print("Need proper file name passed!")
+        sys.exit(1)
+
+    filename = sys.argv[1]
+    with open(filename) as f:
+        for line in f:
+            # print(line)
+            if line == '':
+                continue
+            comment_split = line.split('#')
+            # print(comment_split) # [everything before #, everything after #]
+            num = comment_split[0].strip()
+
+            memory[address] = int(num)
+            address += 1
+
 
 # ALL THE CODE BELOW IS THE "COMPUTER"
 running = True
 pc = 0
 registers = [0] * 8
+
+load_program_into_memory()
+# running = False
 
 while running:
     # lets receive some instructions, and execute them
@@ -132,3 +166,8 @@ while running:
         print(f"Unknown instruction {command}")
         sys.exit(1)
         
+
+# ram = [0] * 256
+
+# def ram_read(self, mar):
+#     return 
