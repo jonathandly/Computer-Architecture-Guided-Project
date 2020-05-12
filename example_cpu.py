@@ -2,11 +2,13 @@ import sys
 
 # op codes, this is what you would give a programmer as "documentation"
 PRINT_JONATHAN = 1
-HALT           = 2
-PRINT_NUM      = 3
-SAVE           = 4
+HALT = 2
+PRINT_NUM = 3
+SAVE = 4
 PRINT_REGISTER = 5
-ADD            = 6
+ADD = 6
+POP = 7
+PUSH = 8
 
 # sample programs that prints jonathans
 print_jonathan_program = [
@@ -54,8 +56,8 @@ add_numbers = [
     SAVE,   # SAVE number 45 to reg 2
     45,
     2,
-    ADD, # Reg1 += Reg2 ( we add the two values in the two registers, and 
-         # store the result in the first register )
+    ADD,  # Reg1 += Reg2 ( we add the two values in the two registers, and
+    # store the result in the first register )
     1,
     2,
     PRINT_REGISTER,
@@ -71,15 +73,16 @@ add_numbers = [
     HALT,
 ]
 
-# this is where we "load" a program
+# this is where we "initialize the memory"
 memory = [0] * 256
 # memory = add_numbers
 # memory = save_num_to_reg
 
-## Read from file and load into memory
-## read the filename from command line arguments
-## open the file, and load each line into memory
-## lets try not to crash
+# Read from file and load into memory
+# read the filename from command line arguments
+# open the file, and load each line into memory
+# lets try not to crash
+
 
 def load_program_into_memory():
     # reset the memory first
@@ -109,6 +112,10 @@ def load_program_into_memory():
 running = True
 pc = 0
 registers = [0] * 8
+SP = 7  # register location that holds top of stack address
+# store the top of memory into Register 7
+registers[SP] = len(memory) - 1
+
 
 load_program_into_memory()
 # running = False
@@ -161,13 +168,33 @@ while running:
         val2 = registers[register2]
         registers[register1] = val1 + val2
         pc += 3
+    elif command == PUSH:
+        # PUSH Register value to the stack
+        register = memory[pc + 1]
+        # decrement the Stack Pointer (SP)
+        registers[SP] -= 1
+        # read the next value for register location
+        register_value = registers[register]
+        # take the value in that register and add to stack
+        memory[registers[SP]] = register_value
+        pc += 2
+    elif command == POP:
+        # POP (register value)
+        # POP value off stack at location SP
+        value = memory[registers[SP]]
+        register = memory[pc + 1]
+        # store the value in register given
+        registers[register] = value
+        # increment the Stack Pointer (SP)
+        registers[SP] += 1
+        pc += 2
     else:
         # if command is unrecognizable
         print(f"Unknown instruction {command}")
         sys.exit(1)
-        
+
 
 # ram = [0] * 256
 
 # def ram_read(self, mar):
-#     return 
+#     return
